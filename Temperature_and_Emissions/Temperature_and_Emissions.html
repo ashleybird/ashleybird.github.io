@@ -14606,7 +14606,7 @@ init_mathjax();
       <div>
         <h1>Temperature Rise based on GHG Emissions</h1>
         <p class="w3-padding-32 w3-text-grey">25 July 2023</p>
-        <p>In this project, I'll analyze datasets that have both spatial and temporal features to understand the impact of greenhouse gas (GHG) emissions on temperature. To prepare the data, I'll test two methods for handling the spatial aspect of the data (geohashing) and two methods for calculating the anomalous temperature feature (globally vs regionally). The results will be compared to data from NASA for evaluation. After the date is prepared, I'll use a simple linear regression model to try predicting the anomalous temperature based on GHG emissions.</p>
+        <p>In this project, I'll analyze datasets that have both spatial and temporal features to understand the impact of greenhouse gas (GHG) emissions on temperature. To prepare the data, I'll test two methods for handling the spatial aspect of the data (geohashing) and two methods for calculating the anomalous temperature feature (globally vs regionally). The processed data will be compared to data from NASA to evaluate the different methods. After the date is prepared, I'll use a simple linear regression model to try predicting the anomalous temperature based on GHG emissions.</p>
         <p>The code and data can be found on <a href = "https://github.com/ashleybird/ashleybird.github.io/tree/main/Temperature_and_Emissions">my github</a>.</p>
         <p><em>Note: Originally, I analyzed this dataset with a partner for a project for the <a href = "https://ds100.org/sp21">Data Science 200</a> course at UC Berkeley. I've revamped the data cleaning, analysis, and modeling to investigate some lingering questions after the class.</em></p>
       </div>
@@ -14614,8 +14614,8 @@ init_mathjax();
       <div>
         <h2 id="Where-is-the-data-coming-from?">Where is the data coming from?</h2><p>Three datasets are used:</p>
         <ul>
-        <li><strong>Daily Temperature</strong>: Obtained from the Global Historical Climatology Network (GHCN). The dataset for each year was preprocessed to only include data from stations with both temperature and precipitation measurements.</li>
-        <li><strong>GHG Emissions</strong>: Obtained from the Environmental Protection Agency (EPA) and contains the type and total amount of CO2-equivalents of gas emissions by facilities in the US.</li>
+        <li><strong>Daily Global Weather</strong>: Obtained from the Global Historical Climatology Network (GHCN). The dataset for each year was preprocessed to only include data from stations with both temperature and precipitation measurements.</li>
+        <li><strong>US GHG Emissions</strong>: Obtained from the Environmental Protection Agency (EPA) and contains the type and total amount of CO2-equivalents of gas emissions by facilities in the US.</li>
         <li><strong>Accepted Anomalous Temperature</strong>: Obtained from <a href = "https://climate.nasa.gov">NASA</a> containing accepted values for the increase in global temperature.</li>
         </ul>
       </div>
@@ -14679,10 +14679,10 @@ init_mathjax();
         <ul>
         <li>Anomalous temperature: The deviation/change in average temperature from average temperature of a reference year</li>
         <li>Accumulated emissions: The cumulative sum of emissions based on previous years of data
-        These features can be calculated globally or regionally. We'll use geohashing get regional information. Additionally, accumulated emissions can be calculated for all GHG gases or calculated for each GHG gas type, which would increase the complexity of our model.</li>
+        These features can be calculated globally or regionally. We'll use geohashing to get regional information. Additionally, accumulated emissions can be calculated for all GHG gases or calculated for each GHG gas type, which would increase the complexity of our model.</li>
         </ul>
         <h3>Preparing the Global Weather Data</h3>
-        <p>First, what does that data look like? <code>global_weather</code> contains the station locations where measurements are taken and the daily precipitation in $mm\times10$ (<code>PRCP</code>) and the daily average temperature in $Celsius\times10$ (<code>TAVG</code>) at a station. The time and location for each measurement is also recorded.</p>
+        <p>First, what does that data look like? <code>global_weather</code> contains the station locations where measurements are taken and the daily precipitation in $mm\times10$ (<code>PRCP</code>) and the daily average temperature in $Celsius\times10$ (<code>TAVG</code>) at a station. The date and location for each measurement is also recorded.</p>
       </div>
 
       <div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -14937,7 +14937,7 @@ init_mathjax();
         
         </div>
         <div>
-        <p>Let's inspect the data a bit more. I'll plot the distribution of the daily average temperature on a given day. There should be a broad range of Temperatures due differences in climates around the globe. This distribution is not uniform due to the uneven distribution of stations (and climates) around the globe.</p>
+        <p>Let's inspect the data a bit more. I'll plot the distribution of the average temperature on a given day. There should be a broad range of temperatures due to differences in climates around the globe. This distribution is not uniform due to the uneven distribution of stations (and climates) around the globe.</p>
         
         </div>
         <div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -15089,10 +15089,10 @@ init_mathjax();
         </div>
         <div>
         <p><strong>Feature Engineering: Calculating Anomalous Temperature</strong></p>
-        <p>It turns out when people talk about global temperature rise, this is foten represented as the <em>anomalous temperature</em>, which is this change in temperature from a reference time period. Since our oldest data is from 2011, 2011 will be our reference point. I'll create new features in the dataframe for the anomalous temperature, as well as the anomalous precipitation.</p>
-        <p>There are a couple ways to calculate this:</p>
+        <p>It turns out when people talk about global temperature rise, this is often represented as the <em>anomalous temperature</em>, which is the change in temperature from a reference time period. Since our oldest data is from 2011, the average temperature in 2011 will be our reference point. I'll create new features in the dataframe for the anomalous temperature, as well as the anomalous precipitation.</p>
+        <p>There are a couple ways to calculate anomalous values:</p>
         <ul>
-        <li>Globally: Calculate the average temperature of a region in a year &gt; Average the values together for a global average &gt; Substract the value from the reference year</li>
+        <li>Globally: Calculate the average temperature of a region in a year &gt; Average the values together for a global average &gt; Subtract the value from the reference year</li>
         <li>Regionally: Calculate the average temperature of a region in a year &gt; Subtract the average temperature for that region from the reference year &gt; Average the anomalous values together.</li>
         </ul>
         <p>The results also depend on how coarse-grained the geohashing method is. I'll evaluate the effectiveness of two different methods for geohashing (pygeohash and my geohashing method) by comparing the results to data from NASA.</p>
@@ -15158,7 +15158,7 @@ init_mathjax();
         </div>
         <div>
         <p><strong>Applying data cleaning functions with <code>pipe</code></strong></p>
-        <p>Now that the functions are defined, a convenient way to apply them to the dataset is with the <code>pipe</code> funciton. It's good to verify the changes have been made by inspecting the dataframe and the dtypes.</p>
+        <p>Now that the functions are defined, a convenient way to apply them to the dataset is with the <code>pipe</code> function. It's good to verify the changes have been made by inspecting the dataframe and the dtypes.</p>
         
         </div>
         <div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -15338,7 +15338,7 @@ init_mathjax();
         
         </div>
         <div>
-        <p>It would be good to know just how many regions are created with each geohashing method. There are fewer codes using my approach (305) compared to pygeohash (424), so my approach is more coarse-grained. I'll also plot this distribution to get an idea of how uniform the stations are spread in the geohash regions. Note that some regions have a large amount (&gt;20,000) stations/measurement locations, while other regions have less than 10.</p>
+        <p>It would be good to know just how many regions are created with each geohashing method. There are fewer codes using my approach (305) compared to pygeohash (424), so my approach is more coarse-grained. I'll also plot this distribution to get an idea of how uniform the stations are spread in the geohash regions. Note that some regions have a large number (&gt;20,000) stations/measurement locations, while other regions have less than 10.</p>
         
         </div>
         <div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -15475,9 +15475,9 @@ init_mathjax();
         
         </div>
         <div>
-        <p>Although the shapes of the plots are similar, the temperatures calculated are different. This may be due to the differences in geohashing approach. In pygeohash, the given latitudes and longitudes are assigned codes, so regions without stations/measurements are unweighted in the results. In my geohashing approaching, the code looks for data points within all regions of the globe. It is also a coarser approach, which may help by adding weight to regions with few data points.</p>
-        <p>To compare these results to NASA's results, we'll need to calculate the anomalous temperature, which had two calculation methods to evaluate. Using the first method, I'll also compare geohashing methods by comparing the plots and calculating thet correlation.</p>
-        <p>Before I can begin the comparison, I'll need slice out the data from 2011-2019 and recalculate NASA's anomalous temperature so that all datasets use the same reference year. After plotting, it looks like my geohashing approach follows the shape of NASA's results better, but pygeohash calculates values closer to NASA's.</p>
+        <p>Although the shapes of the plots are similar, the temperatures calculated are different. This may be due to the differences in geohashing approach. In pygeohash, the given latitudes and longitudes are assigned codes, so regions without stations/measurements are unweighted in the results. In my geohashing approach, the code looks for data points within all regions of the globe. It is also a coarser approach, which may help by adding weight to regions with few data points.</p>
+        <p>Next, we'll need to calculate the anomalous temperature, which had two calculation methods (globally or regionally). Using the global averages method, I'll also compare pygeohash results to my geohashing method's results. The methods for calculating anomalous temperature and methods for geohashing are evaluated by calculating the correlation between these results and NASA's results.</p>
+        <p>Before I can begin the comparison, I'll need to slice out the data from 2011-2019 and recalculate NASA's anomalous temperature so that all datasets use the same reference year. After plotting, it looks like my geohashing approach follows the shape of NASA's results better, but using pygeohash calculates values closer to NASA's.</p>
         
         </div>
         <div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -15588,7 +15588,7 @@ init_mathjax();
         
         </div>
         <div>
-        <p>The deviations between my results and NASA's can be attributed to data source and geohashing methods. Given the strong correlation between my calculations with NASA's, I feel confident with the cleaning process. However, I'll soon see that the GHG emissions data is annual and only located in the US (values are reported by the US EPA). Using annual data will leave me with 10 data points--not great for training and evaluating a model! While I'll still look at the correlation between <em>accumulated</em> GHG emissions and anomalous temperature, I want to develop a model relating the local GHG emissions to local anomalous temperature. Fortunately, I've already calculated the dataframe with yearly anomalous temperature b region, <code>regional_df</code>. To see how the anomalous temperature changes by region, I can utilize pivot tables for plotting. Since there are too many regions to plot at once (&gt;300), I'll start by inspecting the 10 regions.</p>
+        <p>The deviations between my results and NASA's can be attributed to the data source and geohashing methods. Given the strong correlation between my calculations with NASA's, I feel confident with the cleaning process. The GHG emissions data is annual and only located in the US (values are reported by the US EPA), and using global annual data will leave me with 10 data points--not great for training and evaluating a model! While I'll still look at the correlation between global <em>accumulated</em> GHG emissions and anomalous temperature, I want to develop a model that predicts regional anomalous temperature using regional GHG emissions. I've already calculated the dataframe with annual anomalous temperature by region, <code>regional_df</code>. To visualize how the anomalous temperature changes by region, I can utilize pivot tables for plotting. Since there are too many regions to plot at once (&gt;300), I'll start by inspecting 10 regions selected at random.</p>
         <p>This dataset is ready to merge with the GHG emissions data.</p>
         
         </div>
@@ -15655,7 +15655,7 @@ init_mathjax();
         
         </div>
         <div>
-        <h3>GHG Emissions Data</h3>
+        <h3>Preparing GHG Emissions Data</h3>
         <p><code>emissions_gas_type</code> gives information on gas emissions (type, amount in $CO_2$ equivalents, $CO_2e$) in a year by a particular facility. There are extra columns, and the names are long. So, let's select desirable columns and rename columns to simpler names. Let's also check for null values.</p>
         
         </div>
@@ -15900,7 +15900,7 @@ init_mathjax();
         </div>
         <div>
         <p><strong>Handling null values</strong></p>
-        <p>Some facilities are missing latitude and longitude coordinate, which will cause an issue when we try to encode the location with geohashing. To see if these records are important or if they can be dropped, let's try to understand what facilities are missing latitude and longitude.</p>
+        <p>Some facilities are missing latitude and longitude coordinates, which will cause an issue when we try to encode the location with geohashing. To see if these records are important or if they can be dropped, let's try to understand what facilities are missing latitude and longitude.</p>
         
         </div>
         <div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -15989,7 +15989,7 @@ init_mathjax();
         
         </div>
         <div>
-        <p>A lot of the facilities are in Texas. While most don't appear to have significant emissions, some facilities do, and we should not drop these data points. Instead, we will use a geocoder to convert the zip codes to coodinates. I'll define dictionaries with the City as the key and the coordinates as the values. Then, I can fill in the missing values by mapping the city to the latitude and longitude. Checking for null values verifies the coordinates have been added.</p>
+        <p>A lot of the facilities are in Texas. While most don't appear to have significant emissions, some facilities do, and we should not drop these data points. Instead, we will use a geocoder to convert the zip codes to coordinates. I'll define dictionaries with the City as the key and the coordinates as the values. Then, I can fill in the missing values by mapping the city to the latitude and longitude. Checking for null values verifies the coordinates have been added.</p>
         
         </div>
         <div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -16111,7 +16111,7 @@ init_mathjax();
         
         </div>
         <div>
-        <p>We have data from 2010 to 2019, which provides data for more years than we have, so we'll drop data from 2010. Now, let's apply geohashing now that I have latitude and longitude coordinates for all records. Since my geohashing method correlated better with published results, I'll use that method. Since the GHG emissions reporting only covers the US, there are significantly fewer geohash codes in this dataset.</p>
+        <p>We have data from 2010 to 2019, which provides data for more years than we have, so we'll drop data from 2010. Now, let's apply geohashing now that I have latitude and longitude coordinates for all records. Since my geohashing method correlated better with published results, I'll use that method. Since the GHG emissions are only reported for the US, there are significantly fewer geohash codes in this dataset.</p>
         
         </div>
         <div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -16248,7 +16248,7 @@ init_mathjax();
         </div>
         <div>
         <p><strong>Feature Engineering: Accumulated Emissions</strong></p>
-        <p>Now to calculate the accumulated emissions by year which corresponds to <code>my_yearly_df</code>. If we plot total accumulated GHG emissions from US facilities vs the anomalist temperature, we see a positive correlation consistent with expectations.</p>
+        <p>Now to calculate the accumulated emissions by year, which corresponds to <code>my_yearly_df</code>. If we plot total accumulated GHG emissions from US facilities vs the anomalous temperature, we see a positive correlation consistent with our expectations.</p>
         
         </div>
         <div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -16372,7 +16372,7 @@ init_mathjax();
         </div>
         <div>
         <p><strong>How does the local temperature rise depend on local emissions?</strong></p>
-        <p>For this, we'll use the anomalous temperatures by region (<code>regional_df</code>). To compare on a plot, I've normalized the total GHG emissions in  year for a given region by their respective means since the amount of emissions varies.</p>
+        <p>For this, we'll use the anomalous temperatures by region (<code>regional_df</code>). To compare on a plot, I've normalized the total GHG emissions in a year for a given region by their respective means, which makes visualizing comparisons easier when the amount of emissions by each GHG type varies greatly.</p>
        
         </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
         <div class="jp-Cell-inputWrapper">
@@ -16445,7 +16445,7 @@ init_mathjax();
         
         </div>
         <div>
-        <p>Based on the right plot, region 441 has the most emissions over time. <strong>Where is this region?</strong> Using <code>my_gh_dict</code>, I can extract the latitude and longitude that form the coordinates for this region and label it on a map. It makes sense there are a lot of emissions in the south-eastern US.</p>
+        <p>Based on the right plot, region 441 has the most emissions over time. <strong>Where is this region?</strong> Using <code>my_gh_dict</code>, I can extract the latitude and longitude for this region and label it on a map. It makes sense there are a lot of emissions in the southeastern US.</p>
         
         </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
         <div class="jp-Cell-inputWrapper">
@@ -16672,7 +16672,7 @@ init_mathjax();
         
         </div>
         <div>
-        <h2 id="Modeling">Modeling<a class="anchor-link" href="#Modeling">&#182;</a></h2><p>We will use a simple linear regression model for this quantitative data. Given our knowledge about the causes of climate change, let's predict the anomalous temperature given GHG emissions. First, we will try modeling regional anomalous temperture given gas type and accumulated emissions.</p>
+        <h2 id="Modeling">Modeling<a class="anchor-link" href="#Modeling">&#182;</a></h2><p>We will use a simple linear regression model for this quantitative data. Given our knowledge about the causes of climate change, let's predict the anomalous temperature given GHG emissions. First, we will try modeling regional anomalous temperature given gas type and accumulated emissions.</p>
 
         </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
         <div class="jp-Cell-inputWrapper">
@@ -16893,7 +16893,7 @@ init_mathjax();
         
         </div>
         <div>
-        <p>We get a much better fit! Note that the above does not account for emissions by other countries. However, this result still demonstrates the US has a significant impact on global temperature rise.</p>
+        <p>We get a much better fit! Note that the above does not account for emissions by other countries. This result demonstrates that the US has a significant impact on global temperature rise.</p>
         <h3>fin.</h3>
         </div>
 
